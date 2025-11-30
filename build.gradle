@@ -1,6 +1,7 @@
 plugins {
-	id 'fabric-loom' version '1.8-SNAPSHOT'
-	id 'maven-publish'
+//	id 'fabric-loom' version '1.8-SNAPSHOT'
+    id 'fabric-loom' version '1.10-SNAPSHOT'
+    id 'maven-publish'
 }
 
 
@@ -67,9 +68,10 @@ java {
 }
 
 jar {
-	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
-	}
+    from("LICENSE") {
+        // rename { "${it}_${project.archivesBaseName}"}
+        rename { "${it}_${base.archivesName}"}
+    }
 }
 
 // configure the maven publication
