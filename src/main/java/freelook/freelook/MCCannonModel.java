@@ -45,7 +45,7 @@ public class MCCannonModel implements Differentiand{
         double Xf2 = ((effectiveWindChargePower * Xf1) / windChargeTntDistanceThingy) + initialArrowXOffset;
         double Yf2 = ((effectiveWindChargePower * Yf1) / windChargeTntDistanceThingy) + initialArrowYOffset + TNTDropoffAfterMoving;
         double Zf2 = ((effectiveWindChargePower * Zf1) / windChargeTntDistanceThingy) + initialArrowZOffset;
-
+  
         double distanceFromTNTToArrow = pythagoreanTheorem(Xf2, Yf2, Zf2);
 
         double effectiveTNTPower = (1 - (distanceFromTNTToArrow / TNTRange)) * totalTNTPower;
