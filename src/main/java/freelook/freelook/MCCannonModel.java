@@ -3,25 +3,36 @@ package freelook.freelook;
 public class MCCannonModel implements Differentiand{
 
     final int cannonOrientation = 1;
-    final double surfaceDistance = 0.375;
-    final double windChargeRange = 1.1;
-    final double totalWindChargePower = 1;
+    //final double surfaceDistance = 0.375;
+    final double surfaceDistance = 0.375 - 0.01;
+    //final double windChargeRange = 1.1;
+    final double windChargeRange = 2.4;
+    //final double totalWindChargePower = 1;
+    final double totalWindChargePower = 1.22 * 2 / 3;
     final double explosionOffsetFromSurface = -0.25;
     final double initialTNTXOffset = 0;
-    final double initialTNTYOffset = 0.25;
+    //final double initialTNTYOffset = 0.25;
+    final double initialTNTYOffset = 0.2615;
     final double initialTNTZOffset = 0;
     final double initialArrowXOffset = 0;
-    final double initialArrowYOffset = 0.02472;
+    //final double initialArrowYOffset = 0.02472;
+    final double initialArrowYOffset = -0.01528;
     final double initialArrowZOffset = 0;
+    final double TNTDropoffAfterMoving = 0.04;
+    final double TNTRange = 8;
+    final double totalTNTPower = 30;
+    final double initialArrowXMomentum = 0;
+    final double initialArrowYMomentum = 0.70594;
+    final double initialArrowZMomentum = 0;
 
     public Vector2D f(final Vector2D in) {
 
         double relativeYaw = rotateAxis(in.x, cannonOrientation);
         double directionOfCollisionSurface = getDirectionOfCollisionSurface(relativeYaw);
 
-        double XWindChargeImpact = directionOfCollisionSurface* surfaceDistance;
+        double XWindChargeImpact = directionOfCollisionSurface * surfaceDistance;
         double YWindChargeImpact = surfaceDistance * Math.abs(1.0/Math.cos(relativeYaw))*Math.tan(-in.y);
-        double ZWindChargeImpact = surfaceDistance * Math.tan(relativeYaw);
+        double ZWindChargeImpact = directionOfCollisionSurface * surfaceDistance * Math.tan(relativeYaw);
 
         double Xf1 = XWindChargeImpact + initialTNTXOffset + directionOfCollisionSurface * explosionOffsetFromSurface;
         double Yf1 = YWindChargeImpact + initialTNTYOffset;
@@ -29,17 +40,25 @@ public class MCCannonModel implements Differentiand{
 
         double windChargeTntDistanceThingy = pythagoreanTheorem(Xf1, Yf1, Zf1);
 
-        double effectiveWindChargePower = (windChargeRange - windChargeTntDistanceThingy)* totalWindChargePower;
+        double effectiveWindChargePower = (1 - (windChargeTntDistanceThingy / windChargeRange)) * totalWindChargePower;
 
-        double Xf2 = (effectiveWindChargePower * Xf1 + initialArrowXOffset) / effectiveWindChargePower;
-        double Yf2 = (effectiveWindChargePower * Yf1 + initialArrowYOffset) / effectiveWindChargePower;
-        double Zf2 = (effectiveWindChargePower * Zf1 + initialArrowZOffset) / effectiveWindChargePower;
+        double Xf2 = ((effectiveWindChargePower * Xf1) / windChargeTntDistanceThingy) + initialArrowXOffset;
+        double Yf2 = ((effectiveWindChargePower * Yf1) / windChargeTntDistanceThingy) + initialArrowYOffset + TNTDropoffAfterMoving;
+        double Zf2 = ((effectiveWindChargePower * Zf1) / windChargeTntDistanceThingy) + initialArrowZOffset;
+
+        double distanceFromTNTToArrow = pythagoreanTheorem(Xf2, Yf2, Zf2);
+
+        double effectiveTNTPower = (1 - (distanceFromTNTToArrow / TNTRange)) * totalTNTPower;
+
+        double Xf3 = (Xf2 * (effectiveTNTPower / distanceFromTNTToArrow)) + initialArrowXMomentum;
+        double Yf3 = (Yf2 * (effectiveTNTPower / distanceFromTNTToArrow)) + initialArrowYMomentum;
+        double Zf3 = (Zf2 * (effectiveTNTPower / distanceFromTNTToArrow)) + initialArrowZMomentum;
 
 //        System.out.println(Xf2);
 //        System.out.println(Yf2);
 //        System.out.println(Zf2);
 
-        return new Vector3D(Xf2, Yf2, Zf2).cartesianToBullshit();
+        return new Vector3D(Xf3, Yf3, Zf3).cartesianToBullshit();
     }
 
     double pythagoreanTheorem(double a, double b, double c){
