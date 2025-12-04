@@ -24,6 +24,7 @@ public class MCCannonModel implements Differentiand{
     final double initialArrowXMomentum = 0;
     final double initialArrowYMomentum = 0.70594;
     final double initialArrowZMomentum = 0;
+    final double arrowEyeHeight = 0.13;
 
     public Vector2D f(final Vector2D in) {
 
@@ -38,21 +39,22 @@ public class MCCannonModel implements Differentiand{
         double Yf1 = YWindChargeImpact + initialTNTYOffset;
         double Zf1 = ZWindChargeImpact + initialTNTZOffset;
 
-        double windChargeTntDistanceThingy = pythagoreanTheorem(Xf1, Yf1, Zf1);
+        double distanceFromWindChargeToTNT = pythagoreanTheorem(Xf1, Yf1, Zf1);
 
-        double effectiveWindChargePower = (1 - (windChargeTntDistanceThingy / windChargeRange)) * totalWindChargePower;
+        double effectiveWindChargePower = (1 - (distanceFromWindChargeToTNT / windChargeRange)) * totalWindChargePower;
 
-        double Xf2 = ((effectiveWindChargePower * Xf1) / windChargeTntDistanceThingy) + initialArrowXOffset;
-        double Yf2 = ((effectiveWindChargePower * Yf1) / windChargeTntDistanceThingy) + initialArrowYOffset + TNTDropoffAfterMoving;
-        double Zf2 = ((effectiveWindChargePower * Zf1) / windChargeTntDistanceThingy) + initialArrowZOffset;
-  
-        double distanceFromTNTToArrow = pythagoreanTheorem(Xf2, Yf2, Zf2);
+        double Xf2 = ((effectiveWindChargePower * Xf1) / distanceFromWindChargeToTNT) + initialArrowXOffset;
+        double Yf2 = ((effectiveWindChargePower * Yf1) / distanceFromWindChargeToTNT) + initialArrowYOffset + TNTDropoffAfterMoving;
+        double Zf2 = ((effectiveWindChargePower * Zf1) / distanceFromWindChargeToTNT) + initialArrowZOffset;
 
-        double effectiveTNTPower = (1 - (distanceFromTNTToArrow / TNTRange)) * totalTNTPower;
+        double distanceFromTNTToArrowFeet = pythagoreanTheorem(Xf2, Yf2 - arrowEyeHeight, Zf2);
+        double distanceFromTNTToArrowEyes = pythagoreanTheorem(Xf2, Yf2, Zf2);
 
-        double Xf3 = (Xf2 * (effectiveTNTPower / distanceFromTNTToArrow)) + initialArrowXMomentum;
-        double Yf3 = (Yf2 * (effectiveTNTPower / distanceFromTNTToArrow)) + initialArrowYMomentum;
-        double Zf3 = (Zf2 * (effectiveTNTPower / distanceFromTNTToArrow)) + initialArrowZMomentum;
+        double effectiveTNTPower = (1 - (distanceFromTNTToArrowFeet / TNTRange)) * totalTNTPower;
+
+        double Xf3 = (Xf2 * (effectiveTNTPower / distanceFromTNTToArrowEyes)) + initialArrowXMomentum;
+        double Yf3 = (Yf2 * (effectiveTNTPower / distanceFromTNTToArrowEyes)) + initialArrowYMomentum;
+        double Zf3 = (Zf2 * (effectiveTNTPower / distanceFromTNTToArrowEyes)) + initialArrowZMomentum;
 
 //        System.out.println(Xf2);
 //        System.out.println(Yf2);
